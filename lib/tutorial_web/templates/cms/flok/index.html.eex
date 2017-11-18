@@ -1,0 +1,32 @@
+<h2>Listing Floks</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Description</th>
+      <th>Published</th>
+      <th>Sport</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for flok <- @floks do %>
+    <tr>
+      <td><%= flok.title %></td>
+      <td><%= flok.description %></td>
+      <td><%= flok.published %></td>
+      <td><%= flok.sport %></td>
+
+      <td class="text-right">
+        <span><%= link "Show", to: cms_flok_path(@conn, :show, flok), class: "btn btn-default btn-xs" %></span>
+        <span><%= link "Edit", to: cms_flok_path(@conn, :edit, flok), class: "btn btn-default btn-xs" %></span>
+        <span><%= link "Delete", to: cms_flok_path(@conn, :delete, flok), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Flok", to: cms_flok_path(@conn, :new) %></span>

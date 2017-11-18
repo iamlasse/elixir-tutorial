@@ -1,0 +1,39 @@
+<h2>Show Flok</h2>
+
+<ul>
+
+  <li>
+    <strong>Title:</strong>
+    <%= @flok.title %>
+  </li>
+
+  <li>
+    <strong>Description:</strong>
+    <%= @flok.description %>
+  </li>
+
+  <li>
+    <strong>Published:</strong>
+    <%= @flok.published %>
+  </li>
+
+  <li>
+    <strong>Sport:</strong>
+    <%= @flok.sport %>
+  </li>
+
+  <li>Created by: <%= creator_name(@flok) %></li>
+  <li>
+
+  <%= for player <- @flok.players do %>
+
+      <%= player.username %>
+
+  <%= end %>
+
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: cms_flok_path(@conn, :edit, @flok) %></span>
+<span><%= link "Back", to: cms_flok_path(@conn, :index) %></span>

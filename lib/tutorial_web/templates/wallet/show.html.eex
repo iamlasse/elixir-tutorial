@@ -1,0 +1,18 @@
+<h2>Show Wallet</h2>
+
+<ul>
+
+  <li>
+    <strong>Type:</strong>
+    <%= @wallet.type %>
+  </li>
+
+  <li>
+    <strong>Date:</strong>
+    <%= @wallet.date %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: wallet_path(@conn, :edit, @wallet) %></span>
+<span><%= link "Back", to: wallet_path(@conn, :index) %></span>

@@ -1,0 +1,5 @@
+<h2>Edit Wallet</h2>
+
+<%= render "form.html", Map.put(assigns, :action, wallet_path(@conn, :update, @wallet)) %>
+
+<span><%= link "Back", to: wallet_path(@conn, :index) %></span>

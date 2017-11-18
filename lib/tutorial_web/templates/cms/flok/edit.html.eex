@@ -1,0 +1,5 @@
+<h2>Edit Flok</h2>
+
+<%= render "form.html", Map.put(assigns, :action, cms_flok_path(@conn, :update, @flok)) %>
+
+<span><%= link "Back", to: cms_flok_path(@conn, :index) %></span>
