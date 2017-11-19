@@ -6,8 +6,9 @@ defmodule Tutorial.Accounts do
   import Ecto.Query, warn: false
   alias Tutorial.Repo
 
+  alias Tutorial.Accounts
   alias Tutorial.Accounts.{User, Credential}
-
+    import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
   @doc """
   Returns the list of users.
 
@@ -42,6 +43,15 @@ defmodule Tutorial.Accounts do
     |> Repo.get!(id)
     |> Repo.preload(:credential)
   end
+
+  def find_user(id) do
+    case Repo.get!(User, id) do
+      %User{} = user -> {:ok, user}
+      nil -> {:error, :no_resource}
+    end
+  end
+
+
 
   @doc """
   Creates a user.
@@ -110,18 +120,31 @@ defmodule Tutorial.Accounts do
     User.changeset(user, %{})
   end
 
+  def verify_credentials(email, password) when is_binary(email) and is_binary(password) do
+    with {:ok, user} <- authenticate_by_email(email),
+      do: verify_password(password, user)
+  end
+
   # Basic Authentication
-  def authenticate_by_email_password(email, _password) do
+  def authenticate_by_email(email) do
     query =
       from(
         u in User,
         inner_join: c in assoc(u, :credential),
         where: c.email == ^email
       )
-
     case Repo.one(query) do
-      %User{} = user -> {:ok, user}
+      %User{} = user ->
+        {:ok, user}
       nil -> {:error, :unauthorized}
+    end
+  end
+
+  def verify_password(password, %User{} = user) when is_binary(password) do
+    if checkpw(password, user.password_hash) do
+      {:ok, user}
+    else
+      {:error, :invalid_password}
     end
   end
 

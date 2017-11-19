@@ -2,45 +2,59 @@ defmodule TutorialWeb.Router do
   use TutorialWeb, :router
   alias Tutorial.Accounts
 
+
   pipeline :browser do
     plug(:accepts, ["html"])
     plug(:fetch_session)
     plug(:fetch_flash)
-    plug(:protect_from_forgery)
     plug(:put_secure_browser_headers)
     plug(Tutorial.Auth, repo: Tutorial.Repo)
-    plug(:put_user_token)
-  end
-
-  pipeline :review_checks do
-    # plug :ensure_authenticated_user
-    # plug :ensure_user_owns_review
-    plug(Plug.RequestId)
-    # plug(Plug.Logger)
-
-    plug(
-      Plug.Session,
-      store: :cookie,
-      key: "_hello_key",
-      signing_salt: "change_me"
-    )
   end
 
   pipeline :api do
     plug(:accepts, ["json"])
     plug(:fetch_session)
     plug(:fetch_flash)
-    # plug :authorize
-    # plug :current_user
+  end
+
+  pipeline :browser_pipe do
+    plug(
+      Guardian.Plug.Pipeline,
+      module: Tutorial.Guardian,
+      error_handler: Tutorial.AuthErrorHandler
+    )
+    plug(Guardian.Plug.VerifySession)
+    plug(Guardian.Plug.EnsureAuthenticated)
+    plug(Guardian.Plug.LoadResource, allow_blank: false)
     plug(Tutorial.Auth, repo: Tutorial.Repo)
   end
 
+  pipeline :api_pipe do
+    plug(
+      Guardian.Plug.Pipeline,
+      module: Tutorial.Guardian,
+      error_handler: Tutorial.AuthApiErrorHandler
+    )
+    plug(Guardian.Plug.VerifyHeader, claims: %{"typ" => "access"})
+    plug(Guardian.Plug.EnsureAuthenticated, realm: "Bearer")
+    plug(Guardian.Plug.LoadResource, allow_blank: false)
+    plug(Tutorial.AuthApi, repo: Tutorial.Repo)
+  end
 
+  pipeline :authorize do
+    # plug(Guardian.Plug.VerifySession, claims: %{"typ" => "access"})
+
+  end
 
   scope "/", TutorialWeb do
     # Use the default browser stack
     pipe_through([:browser])
     get("/", RootController, :index)
+
+    scope "/cms", CMS, as: :cms do
+      pipe_through [:browser_pipe, :authorize]
+      resources("/floks", FlokController)
+    end
 
     resources(
       "/auth",
@@ -50,49 +64,23 @@ defmodule TutorialWeb.Router do
     )
 
     # get "/", PageController, :index
+    get("/hello", HelloController, :index)
+    get("/hello/:who", HelloController, :show)
+    pipe_through([:browser_pipe, :authorize])
     resources("/users", UserController)
     resources("/wallets", WalletController)
-    get("/hello", HelloController, :index)
-    get("/hello/:who", HelloController, :show)
   end
 
-  # Other scopes may use custom stacks.
-  scope "/api", TutorialWeb do
-    pipe_through([:api, :review_checks])
-    get("/hello", HelloController, :index)
-    get("/hello/:who", HelloController, :show)
-    forward("/jobs", BackgroundJob.Plug)
+  scope "/api", TutorialWeb, as: :api do
+    pipe_through([:api])
+
+    scope "/auth" do
+      post("/", AuthController, :api_sign_in)
+    end
 
     scope "/cms", CMS, as: :cms do
-      resources "/floks", FlokController
+      pipe_through([:api_pipe, :authorize])
+      resources("/floks", FlokController)
     end
   end
-
-  defp put_user_token(conn, _) do
-    if current_user = conn.assigns[:current_user] do
-      token = Phoenix.Token.sign(conn, "user salt", current_user.id)
-      assign(conn, :user_token, token)
-    else
-      conn
-    end
-  end
-
-  defp authenticate_user(conn, _) do
-    case get_session(conn, :user_id) do
-      nil ->
-        conn
-        |> Phoenix.Controller.put_flash(:error, "Login required")
-        |> Phoenix.Controller.redirect(to: "/")
-        |> halt()
-
-      user_id ->
-        assign(conn, :current_user, Tutorial.Accounts.get_user!(user_id))
-    end
-  end
-
-  # defp authorize(conn, _opts) do
-  #   conn
-  #   |> send_resp(401, "unauthorized")
-  #   |> halt()
-  # end
 end

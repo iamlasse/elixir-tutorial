@@ -8,8 +8,8 @@ defmodule TutorialWeb.CMS.FlokController do
   plug(:authorize_flok when action in [:edit, :update, :delete, :show])
 
   def index(conn, _params) do
-    floks = CMS.list_only_creator_floks(conn.assigns[:current_user])
-    render(conn, "index.html", floks: floks)
+    floks = CMS.only_creator_floks(conn.assigns[:current_user])
+    render(conn, "index." <> get_format(conn), floks: floks)
   end
 
   def new(conn, _params) do
@@ -31,7 +31,7 @@ defmodule TutorialWeb.CMS.FlokController do
 
   def show(conn, _) do
     flok = conn.assigns[:flok]
-    render(conn, "show.html", flok: flok)
+    render(conn, "show." <> get_format(conn), flok: flok)
   end
 
   def edit(conn, _) do
@@ -69,7 +69,6 @@ defmodule TutorialWeb.CMS.FlokController do
 
   defp authorize_flok(conn, _) do
     flok = CMS.get_flok!(conn.params["id"])
-
     if conn.assigns.current_creator.id == flok.creator_id do
       assign(conn, :flok, flok)
     else

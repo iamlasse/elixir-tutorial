@@ -21,19 +21,17 @@ defmodule Tutorial.CMS do
     Flok
     |> Repo.all()
     |> Ecto.assoc(:creator)
-    |> Repo.preload([:players, creator: [user: :credential]])
+    |> Repo.preload([:players, creator: [:user]])
   end
 
 
-  def list_only_creator_floks(user) do
+  def only_creator_floks(user) do
     creator = Repo.get_by! Creator, user_id: user.id
-    IO.inspect creator
     query = from f in Flok,
            where: f.creator_id == ^creator.id,
-           preload: [players: [creator: [user: :credential]]]
+           preload: [:players, :creator]
     query
     |> Repo.all
-    # |> Repo.preload([:players, creator: [user: :credential]])
   end
   @doc """
   Gets a single flok.
@@ -49,7 +47,7 @@ defmodule Tutorial.CMS do
       ** (Ecto.NoResultsError)
 
   """
-  def get_flok!(id), do: Repo.get!(Flok, id) |> Repo.preload([:players, creator: [user: :credential]])
+  def get_flok!(id), do: Repo.get!(Flok, id) |> Repo.preload([:players, creator: [:user]])
 
   @doc """
   Creates a flok.
@@ -220,6 +218,7 @@ defmodule Tutorial.CMS do
   |> Repo.insert()
   |> handle_existing_creator()
 end
+
 defp handle_existing_creator({:ok, creator}), do: creator
 defp handle_existing_creator({:error, changeset}) do
   Repo.get_by!(Creator, user_id: changeset.data.user_id)

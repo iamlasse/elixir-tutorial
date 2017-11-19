@@ -38,6 +38,7 @@ defmodule TutorialWeb.Endpoint do
     key: "_tutorial_key",
     signing_salt: "EFLzPljH"
 
+  plug CORSPlug
   plug TutorialWeb.Router
 
   @doc """
