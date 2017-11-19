@@ -19,6 +19,10 @@ defmodule TutorialWeb.AuthController do
         # |> assign(:current_token, token)
         # |> configure_session(renew: true)
         |> redirect(to: "/wallets")
+      {:error, :invalid_password} ->
+        conn
+        |> put_flash(:error, "Missing or invalid password")
+        |> redirect(to: auth_path(conn, :new))
       {:error, :unauthorized} ->
         conn
         |> put_flash(:error, "Bad email/password combination")
