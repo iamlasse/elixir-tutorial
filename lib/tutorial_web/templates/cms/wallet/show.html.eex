@@ -14,5 +14,5 @@
 
 </ul>
 
-<span><%= link "Edit", to: wallet_path(@conn, :edit, @wallet) %></span>
-<span><%= link "Back", to: wallet_path(@conn, :index) %></span>
+<span><%= link "Edit", to: cms_wallet_path(@conn, :edit, @wallet) %></span>
+<span><%= link "Back", to: cms_wallet_path(@conn, :index) %></span>

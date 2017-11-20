@@ -1,0 +1,5 @@
+<h2>New Wallet</h2>
+
+<%= render "form.html", Map.put(assigns, :action, cms_wallet_path(@conn, :create)) %>
+
+<span><%= link "Back", to: cms_wallet_path(@conn, :index) %></span>

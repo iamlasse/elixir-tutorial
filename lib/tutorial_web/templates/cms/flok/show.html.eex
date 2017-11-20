@@ -29,7 +29,7 @@
 
       <%= player.username %>
 
-  <%= end %>
+  <% end %>
 
   </li>
 

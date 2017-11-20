@@ -8,7 +8,8 @@ defmodule Tutorial.Accounts do
 
   alias Tutorial.Accounts
   alias Tutorial.Accounts.{User, Credential}
-    import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
+  import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
+
   @doc """
   Returns the list of users.
 
@@ -50,8 +51,6 @@ defmodule Tutorial.Accounts do
       nil -> {:error, :no_resource}
     end
   end
-
-
 
   @doc """
   Creates a user.
@@ -121,8 +120,7 @@ defmodule Tutorial.Accounts do
   end
 
   def verify_credentials(email, password) when is_binary(email) and is_binary(password) do
-    with {:ok, user} <- authenticate_by_email(email),
-      do: verify_password(password, user)
+    with {:ok, user} <- authenticate_by_email(email), do: verify_password(password, user)
   end
 
   # Basic Authentication
@@ -133,10 +131,13 @@ defmodule Tutorial.Accounts do
         inner_join: c in assoc(u, :credential),
         where: c.email == ^email
       )
+
     case Repo.one(query) do
       %User{} = user ->
         {:ok, user}
-      nil -> {:error, :unauthorized}
+
+      nil ->
+        {:error, "No user with that email"}
     end
   end
 
@@ -144,23 +145,25 @@ defmodule Tutorial.Accounts do
     if checkpw(password, user.password_hash) do
       {:ok, user}
     else
-      {:error, :invalid_password}
+      {:error, "Invalid password"}
     end
   end
 
   def get_users_map(entries) do
-    query = from(
-      u in User,
-      where: u.id in ^entries,
-      select: %{u.id => %{"username" => u.username}}
+    query =
+      from(
+        u in User,
+        where: u.id in ^entries,
+        select: %{u.id => %{"username" => u.username}}
       )
 
-      users =
+    # |> Repo.preload(:credential)
+    users =
       query
       |> Repo.all()
-      # |> Repo.preload(:credential)
       |> Enum.into(%{})
-      users
+
+    users
   end
 
   alias Tutorial.Accounts.Wallet

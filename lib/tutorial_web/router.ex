@@ -2,7 +2,6 @@ defmodule TutorialWeb.Router do
   use TutorialWeb, :router
   alias Tutorial.Accounts
 
-
   pipeline :browser do
     plug(:accepts, ["html"])
     plug(:fetch_session)
@@ -17,12 +16,15 @@ defmodule TutorialWeb.Router do
     plug(:fetch_flash)
   end
 
-  pipeline :browser_pipe do
+  pipeline :browser_auth do
+    # plug(:requested_path)
+
     plug(
       Guardian.Plug.Pipeline,
       module: Tutorial.Guardian,
       error_handler: Tutorial.AuthErrorHandler
     )
+
     plug(Guardian.Plug.VerifySession)
     plug(Guardian.Plug.EnsureAuthenticated)
     plug(Guardian.Plug.LoadResource, allow_blank: false)
@@ -35,6 +37,7 @@ defmodule TutorialWeb.Router do
       module: Tutorial.Guardian,
       error_handler: Tutorial.AuthApiErrorHandler
     )
+
     plug(Guardian.Plug.VerifyHeader, claims: %{"typ" => "access"})
     plug(Guardian.Plug.EnsureAuthenticated, realm: "Bearer")
     plug(Guardian.Plug.LoadResource, allow_blank: false)
@@ -43,7 +46,6 @@ defmodule TutorialWeb.Router do
 
   pipeline :authorize do
     # plug(Guardian.Plug.VerifySession, claims: %{"typ" => "access"})
-
   end
 
   scope "/", TutorialWeb do
@@ -51,24 +53,19 @@ defmodule TutorialWeb.Router do
     pipe_through([:browser])
     get("/", RootController, :index)
 
-    scope "/cms", CMS, as: :cms do
-      pipe_through [:browser_pipe, :authorize]
-      resources("/floks", FlokController)
-    end
-
-    resources(
-      "/auth",
-      AuthController,
-      only: [:new, :create, :delete],
-      singleton: true
-    )
-
-    # get "/", PageController, :index
     get("/hello", HelloController, :index)
     get("/hello/:who", HelloController, :show)
-    pipe_through([:browser_pipe, :authorize])
+
     resources("/users", UserController)
-    resources("/wallets", WalletController)
+    # CMS
+    scope "/cms", CMS, as: :cms do
+      pipe_through([:browser_auth, :authorize])
+      resources("/floks", FlokController)
+      resources("/wallets", WalletController)
+    end
+
+    # AUTH
+    resources("/auth", AuthController, only: [:new, :create, :delete], singleton: true)
   end
 
   scope "/api", TutorialWeb, as: :api do
@@ -83,4 +80,18 @@ defmodule TutorialWeb.Router do
       resources("/floks", FlokController)
     end
   end
+
+  # defp requested_path(conn, _) do
+  #   IO.puts("PLUG requested path")
+  #   IO.inspect(conn.request_path)
+
+  #   redirect_to =
+  #     case conn.request_path do
+  #       "/auth" <> _ -> "/cms/floks"
+  #       _ -> conn.request_path
+  #     end
+
+  #   conn
+  #   |> put_session(:return_path, redirect_to)
+  # end
 end

@@ -1,4 +1,4 @@
-defmodule TutorialWeb.WalletController do
+defmodule TutorialWeb.CMS.WalletController do
   use TutorialWeb, :controller
 
   alias Tutorial.Accounts
@@ -19,7 +19,7 @@ defmodule TutorialWeb.WalletController do
       {:ok, wallet} ->
         conn
         |> put_flash(:info, "Wallet created successfully.")
-        |> redirect(to: wallet_path(conn, :show, wallet))
+        |> redirect(to: cms_wallet_path(conn, :show, wallet))
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
@@ -49,7 +49,7 @@ defmodule TutorialWeb.WalletController do
       {:ok, wallet} ->
         conn
         |> put_flash(:info, "Wallet updated successfully.")
-        |> redirect(to: wallet_path(conn, :show, wallet))
+        |> redirect(to: cms_wallet_path(conn, :show, wallet))
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", wallet: wallet, changeset: changeset)
@@ -62,6 +62,6 @@ defmodule TutorialWeb.WalletController do
 
     conn
     |> put_flash(:info, "Wallet deleted successfully.")
-    |> redirect(to: wallet_path(conn, :index))
+    |> redirect(to: cms_wallet_path(conn, :index))
   end
 end
