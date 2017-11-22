@@ -72,12 +72,18 @@ defmodule TutorialWeb.Router do
     pipe_through([:api])
 
     scope "/auth" do
-      post("/", AuthController, :api_sign_in)
+      post "/", AuthController, :api_sign_in
     end
 
     scope "/cms", CMS, as: :cms do
       pipe_through([:api_pipe, :authorize])
       resources("/floks", FlokController)
+    end
+
+    scope "/v1" do
+      post "/users/auth0", AuthController, :authenticate
+      pipe_through([:api_pipe, :authorize])
+      get "/users/me", AuthController, :me
     end
   end
 

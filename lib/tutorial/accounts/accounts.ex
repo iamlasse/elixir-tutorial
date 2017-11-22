@@ -42,7 +42,7 @@ defmodule Tutorial.Accounts do
   def get_user!(id) do
     User
     |> Repo.get!(id)
-    |> Repo.preload(:credential)
+    |> Repo.preload([:credential, :creator])
   end
 
   def find_user(id) do
@@ -129,7 +129,8 @@ defmodule Tutorial.Accounts do
       from(
         u in User,
         inner_join: c in assoc(u, :credential),
-        where: c.email == ^email
+        where: c.email == ^email,
+        preload: [:credential, :creator]
       )
 
     case Repo.one(query) do

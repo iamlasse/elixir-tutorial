@@ -20,7 +20,7 @@ defmodule Tutorial.Mixfile do
   def application do
     [
       mod: {Tutorial.Application, []},
-      extra_applications: [:logger, :runtime_tools, :comeonin, :phoenix_pubsub_redis]
+      extra_applications: [:logger, :runtime_tools, :comeonin, :phoenix_pubsub_redis, :tesla, :httpotion]
     ]
   end
 
@@ -47,7 +47,11 @@ defmodule Tutorial.Mixfile do
       {:guardian, "~> 1.0.0-beta"},
       {:comeonin, "~> 4.0"},
       {:bcrypt_elixir, "~> 1.0"},
-      {:cors_plug, "~> 1.1"}
+      {:cors_plug, "~> 1.1"},
+
+      #
+      {:tesla, "~> 0.9.0"},
+      {:httpotion, "~> 3.0.2"}
     ]
   end
 

@@ -2,6 +2,6 @@ defmodule TutorialWeb.CreatorView do
   use TutorialWeb, :view
 
   def render("creator.json", %{creator: creator}) do
-    %{id: creator.id, username: creator.user.username}
+    %{sport: creator.favorite_sport, bio: creator.bio}
   end
 end
