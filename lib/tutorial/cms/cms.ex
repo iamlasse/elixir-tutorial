@@ -26,13 +26,18 @@ defmodule Tutorial.CMS do
   end
 
   def only_creator_floks(user) do
-    creator = Repo.get_by! Creator, user_id: user.id
-    query = from f in Flok,
-           where: f.creator_id == ^creator.id,
-           preload: [:players, :creator]
+    query =
+      from(
+        f in Flok,
+        inner_join: c in assoc(f, :creator),
+        where: c.user_id == ^user.id,
+        preload: [:players, :creator]
+      )
+
     query
     |> Repo.all
   end
+
   @doc """
   Gets a single flok.
 
@@ -47,7 +52,8 @@ defmodule Tutorial.CMS do
       ** (Ecto.NoResultsError)
 
   """
-  def get_flok!(id), do: %Flok{} = flok |> Repo.get!(id) |> Repo.preload([:players, creator: [:user]])
+  def get_flok!(id),
+    do: Flok |> Repo.get!(id) |> Repo.preload([:players, creator: [:user]])
 
   @doc """
   Creates a flok.
@@ -144,7 +150,7 @@ defmodule Tutorial.CMS do
       ** (Ecto.NoResultsError)
 
   """
-  def get_creator!(id), do: %Creator{} = creator |> Repo.get!(id) |> Repo.preload(:floks)
+  def get_creator!(id), do: Creator |> Repo.get!(id) |> Repo.preload(:floks)
 
   @doc """
   Creates a creator.
@@ -212,15 +218,16 @@ defmodule Tutorial.CMS do
   end
 
   def ensure_creator_exists(%User{} = user) do
-  %Creator{user_id: user.id}
-  |> change()
-  |> unique_constraint(:user_id)
-  |> Repo.insert()
-  |> handle_existing_creator()
-end
+    %Creator{user_id: user.id}
+    |> change()
+    |> unique_constraint(:user_id)
+    |> Repo.insert()
+    |> handle_existing_creator()
+  end
 
-defp handle_existing_creator({:ok, creator}), do: creator
-defp handle_existing_creator({:error, changeset}) do
-  Repo.get_by!(Creator, user_id: changeset.data.user_id)
-end
+  defp handle_existing_creator({:ok, creator}), do: creator
+
+  defp handle_existing_creator({:error, changeset}) do
+    Repo.get_by!(Creator, user_id: changeset.data.user_id)
+  end
 end

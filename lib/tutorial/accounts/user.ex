@@ -4,7 +4,7 @@ defmodule Tutorial.Accounts.User do
   """
   use Ecto.Schema
   import Ecto.Changeset
-  alias Tutorial.Accounts.{User, Credential}
+  alias Tutorial.Accounts.{User, Credential, Wallet}
   alias Tutorial.CMS.{Creator, Flok}
   alias Comeonin.Bcrypt
 
@@ -18,7 +18,7 @@ defmodule Tutorial.Accounts.User do
     many_to_many :floks, Flok, join_through: "floks_players"
     has_one :creator, Creator
     has_one :credential, Credential
-
+    has_many :wallets, Wallet
     timestamps()
   end
 

@@ -7,7 +7,7 @@ defmodule TutorialWeb.HelloController do
     render conn, "index.html"
   end
 
-  def show(conn, %{"who" => who} = params) do
+  def show(conn, %{"who" => who} = _params) do
     conn
     |> assign(:message, "Welcome Back!")
     |> render(:show, who: who)

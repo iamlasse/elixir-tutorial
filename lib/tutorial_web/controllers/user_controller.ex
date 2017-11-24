@@ -15,11 +15,11 @@ defmodule TutorialWeb.UserController do
   end
 
   def create(conn, %{"user" => user_params}) do
-    case Accounts.create_user(user_params) do
-      {:ok, user} ->
+    with {:ok, user} <- Accounts.create_user(user_params) do
         conn
         |> put_flash(:info, "User created successfully.")
         |> redirect(to: user_path(conn, :show, user))
+    else
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
     end
@@ -39,11 +39,11 @@ defmodule TutorialWeb.UserController do
   def update(conn, %{"id" => id, "user" => user_params}) do
     user = Accounts.get_user!(id)
 
-    case Accounts.update_user(user, user_params) do
-      {:ok, user} ->
+   with  {:ok, user} <- Accounts.update_user(user, user_params) do
         conn
         |> put_flash(:info, "User updated successfully.")
         |> redirect(to: user_path(conn, :show, user))
+   else
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", user: user, changeset: changeset)
     end

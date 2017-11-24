@@ -4,8 +4,9 @@ defmodule TutorialWeb.CMS.WalletController do
   alias Tutorial.Accounts
   alias Tutorial.Accounts.Wallet
 
+
   def index(conn, _params) do
-    wallets = Accounts.list_wallets()
+    wallets = Accounts.list_user_wallets(conn.assigns.current_user)
     render(conn, "index.html", wallets: wallets)
   end
 
@@ -15,12 +16,12 @@ defmodule TutorialWeb.CMS.WalletController do
   end
 
   def create(conn, %{"wallet" => wallet_params}) do
-    case Accounts.create_wallet(wallet_params) do
-      {:ok, wallet} ->
+    with user <- conn.assigns.current_user,
+      {:ok, wallet} <- Accounts.create_wallet(wallet_params, user) do
         conn
         |> put_flash(:info, "Wallet created successfully.")
         |> redirect(to: cms_wallet_path(conn, :show, wallet))
-
+      else
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
     end
@@ -44,13 +45,11 @@ defmodule TutorialWeb.CMS.WalletController do
 
   def update(conn, %{"id" => id, "wallet" => wallet_params}) do
     wallet = Accounts.get_wallet!(id)
-
-    case Accounts.update_wallet(wallet, wallet_params) do
-      {:ok, wallet} ->
+    with {:ok, wallet} <- Accounts.update_wallet(wallet, wallet_params) do
         conn
         |> put_flash(:info, "Wallet updated successfully.")
         |> redirect(to: cms_wallet_path(conn, :show, wallet))
-
+    else
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", wallet: wallet, changeset: changeset)
     end

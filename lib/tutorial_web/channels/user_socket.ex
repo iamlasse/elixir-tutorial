@@ -28,9 +28,9 @@ defmodule TutorialWeb.UserSocket do
   def connect(%{"token" => token}, socket) do
 
     # max_age: 1209600 is equivalent to two weeks in seconds
-    case verify(socket, "user salt", token, max_age: 86_400) do
-      {:ok, user_id} ->
+    with {:ok, user_id} <- verify(socket, "user salt", token, max_age: 86_400) do
         {:ok, assign(socket, :current_user, Accounts.get_user!(user_id))}
+    else
       {:error, _reason} ->
         :error
     end

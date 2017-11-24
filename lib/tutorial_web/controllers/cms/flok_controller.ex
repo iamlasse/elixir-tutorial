@@ -8,8 +8,13 @@ defmodule TutorialWeb.CMS.FlokController do
   plug(:authorize_flok when action in [:edit, :update, :delete, :show])
 
   def index(conn, _params) do
-    floks = CMS.only_creator_floks(conn.assigns[:current_user])
-    render(conn, "index." <> get_format(conn), floks: floks)
+    with floks <- CMS.only_creator_floks(conn.assigns[:current_user]) do
+        conn
+        |> render("index." <> get_format(conn), floks: floks)
+    else nil ->
+        conn
+        |> render("error." <> get_format(conn), error: "No floks")
+    end
   end
 
   def new(conn, _params) do
@@ -18,12 +23,11 @@ defmodule TutorialWeb.CMS.FlokController do
   end
 
   def create(conn, %{"flok" => flok_params}) do
-    case CMS.create_flok(conn.assigns.current_creator, flok_params) do
-      {:ok, flok} ->
+    with {:ok, flok} <- CMS.create_flok(conn.assigns.current_creator, flok_params) do
         conn
         |> put_flash(:info, "Flok created successfully.")
         |> redirect(to: cms_flok_path(conn, :show, flok))
-
+    else
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
     end
@@ -40,13 +44,11 @@ defmodule TutorialWeb.CMS.FlokController do
   end
 
   def update(conn, %{"flok" => flok_params}) do
-
-    case CMS.update_flok(conn.assigns.flok, flok_params) do
-      {:ok, flok} ->
+    with {:ok, flok} <- CMS.update_flok(conn.assigns.flok, flok_params) do
         conn
         |> put_flash(:info, "Flok updated successfully.")
         |> redirect(to: cms_flok_path(conn, :show, flok))
-
+    else
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", changeset: changeset)
     end
@@ -76,9 +78,5 @@ defmodule TutorialWeb.CMS.FlokController do
       |> redirect(to: cms_flok_path(conn, :index))
       |> halt()
     end
-  end
-
-  defp user_floks(user) do
-    assoc(user, :floks)
   end
 end

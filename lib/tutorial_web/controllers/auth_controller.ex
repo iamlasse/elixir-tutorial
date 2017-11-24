@@ -52,17 +52,16 @@ defmodule TutorialWeb.AuthController do
     response = verify_user(token)
     # IO.inspect
     if Map.has_key?(response.body, "email") do
-      with {:ok, user} <- Accounts.authenticate_by_email(
-        Map.fetch(response.body, "email")),
+      with {:ok, user} <- Accounts.authenticate_by_email(Map.fetch(response.body, "email")),
            {:ok, jwt, claims} <- encode_and_sign(user, %{}) do
         exp = Map.get(claims, "exp")
+
+        conn
+        |> put_resp_header("x-expires", "#{exp}")
+        |> render("token.json", token: jwt, user: user)
       else
         :error ->
           conn |> json(%{error: "No user found"})
-
-          conn
-          |> put_resp_header("x-expires", "#{exp}")
-          |> render("token.json", token: jwt, user: user)
       end
     else
       conn

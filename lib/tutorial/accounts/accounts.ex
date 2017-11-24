@@ -7,9 +7,8 @@ defmodule Tutorial.Accounts do
   import Ecto.Changeset
   alias Tutorial.Repo
 
-  alias Tutorial.Accounts
   alias Tutorial.Accounts.{User, Credential}
-  import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
+  import Comeonin.Bcrypt, only: [checkpw: 2]
 
   @doc """
   Returns the list of users.
@@ -188,6 +187,10 @@ defmodule Tutorial.Accounts do
     Repo.all(Wallet)
   end
 
+  def list_user_wallets(user) do
+    Repo.all(Ecto.assoc(user, :wallets))
+  end
+
   @doc """
   Gets a single wallet.
 
@@ -216,10 +219,11 @@ defmodule Tutorial.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_wallet(attrs \\ %{}) do
+  def create_wallet(attrs \\ %{}, user) do
     %Wallet{}
-    |> Wallet.changeset(attrs)
-    |> Repo.insert()
+      |> Wallet.changeset(attrs)
+      |> put_change(:user_id, user.id)
+      |> Repo.insert()
   end
 
   @doc """

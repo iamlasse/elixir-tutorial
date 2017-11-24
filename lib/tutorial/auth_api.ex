@@ -19,10 +19,9 @@ defmodule Tutorial.AuthApi do
         |> assign(:current_user, nil)
 
       user ->
-        case Accounts.find_user(user.id) do
-          {:ok, user} ->
+        with {:ok, user} <- Accounts.find_user(user.id) do
             put_current_user(conn, user)
-
+        else
           nil ->
             conn
             |> assign(:current_user, nil)

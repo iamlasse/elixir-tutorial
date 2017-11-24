@@ -3,12 +3,11 @@ defmodule TutorialWeb.BackgroundJob.Plug do
 
   """
   import Plug.Conn
-  import TutorialWeb.BackgroundJob.Router
-
+  alias TutorialWeb.BackgroundJob.Router
   def init(opts), do: opts
   def call(conn, opts) do
     conn
     |> assign(:name, Keyword.get(opts, :name, "Background Job"))
-    |> call(opts)
+    |> Router.call(opts)
   end
 end

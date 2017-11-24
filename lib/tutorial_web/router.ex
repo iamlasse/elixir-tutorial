@@ -3,7 +3,6 @@ defmodule TutorialWeb.Router do
   Router
   """
   use TutorialWeb, :router
-  alias Tutorial.Accounts
 
   pipeline :browser do
     plug(:accepts, ["html"])
