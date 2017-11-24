@@ -1,9 +1,11 @@
 defmodule Tutorial.CMS.Flok do
+  @moduledoc """
+  Floks
+  """
   use Ecto.Schema
   import Ecto.Changeset
   alias Tutorial.CMS.{Flok, Creator}
   alias Tutorial.Accounts.User
-
 
   schema "floks" do
     field :description, :string

@@ -4,6 +4,7 @@ defmodule Tutorial.CMS do
   """
 
   import Ecto.Query, warn: false
+  import Ecto.Changeset
   alias Tutorial.Repo
   alias Tutorial.Accounts.User
   alias Tutorial.CMS.{Flok, Creator}
@@ -23,7 +24,6 @@ defmodule Tutorial.CMS do
     |> Ecto.assoc(:creator)
     |> Repo.preload([:players, creator: [:user]])
   end
-
 
   def only_creator_floks(user) do
     creator = Repo.get_by! Creator, user_id: user.id
@@ -47,7 +47,7 @@ defmodule Tutorial.CMS do
       ** (Ecto.NoResultsError)
 
   """
-  def get_flok!(id), do: Repo.get!(Flok, id) |> Repo.preload([:players, creator: [:user]])
+  def get_flok!(id), do: %Flok{} = flok |> Repo.get!(id) |> Repo.preload([:players, creator: [:user]])
 
   @doc """
   Creates a flok.
@@ -64,7 +64,7 @@ defmodule Tutorial.CMS do
   def create_flok(%Creator{} = creator, attrs \\ %{}) do
     %Flok{}
     |> Flok.changeset(attrs)
-    |> Ecto.Changeset.put_change(:creator_id, creator.id)
+    |> put_change(:creator_id, creator.id)
     |> Repo.insert()
   end
 
@@ -144,7 +144,7 @@ defmodule Tutorial.CMS do
       ** (Ecto.NoResultsError)
 
   """
-  def get_creator!(id), do: Repo.get!(Creator, id) |> Repo.preload(:floks)
+  def get_creator!(id), do: %Creator{} = creator |> Repo.get!(id) |> Repo.preload(:floks)
 
   @doc """
   Creates a creator.
@@ -213,8 +213,8 @@ defmodule Tutorial.CMS do
 
   def ensure_creator_exists(%User{} = user) do
   %Creator{user_id: user.id}
-  |> Ecto.Changeset.change()
-  |> Ecto.Changeset.unique_constraint(:user_id)
+  |> change()
+  |> unique_constraint(:user_id)
   |> Repo.insert()
   |> handle_existing_creator()
 end

@@ -52,14 +52,17 @@ defmodule TutorialWeb.AuthController do
     response = verify_user(token)
     # IO.inspect
     if Map.has_key?(response.body, "email") do
-      with {:ok, user}
-        <- Accounts.authenticate_by_email(Map.fetch!(response.body, "email")),
+      with {:ok, user} <- Accounts.authenticate_by_email(
+        Map.fetch(response.body, "email")),
            {:ok, jwt, claims} <- encode_and_sign(user, %{}) do
         exp = Map.get(claims, "exp")
+      else
+        :error ->
+          conn |> json(%{error: "No user found"})
 
-        conn
-        |> put_resp_header("x-expires", "#{exp}")
-        |> render("token.json", token: jwt, user: user)
+          conn
+          |> put_resp_header("x-expires", "#{exp}")
+          |> render("token.json", token: jwt, user: user)
       end
     else
       conn
@@ -71,6 +74,7 @@ defmodule TutorialWeb.AuthController do
 
   def me(conn, _) do
     current_user = current_resource(conn)
+
     with {:ok, user} <- Accounts.get_user!(current_user.id) do
       conn
       |> render(TutorialWeb.UserView, "user.json", user: user)

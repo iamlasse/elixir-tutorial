@@ -90,18 +90,4 @@ defmodule TutorialWeb.Router do
       get "/users/me", AuthController, :me
     end
   end
-
-  # defp requested_path(conn, _) do
-  #   IO.puts("PLUG requested path")
-  #   IO.inspect(conn.request_path)
-
-  #   redirect_to =
-  #     case conn.request_path do
-  #       "/auth" <> _ -> "/cms/floks"
-  #       _ -> conn.request_path
-  #     end
-
-  #   conn
-  #   |> put_session(:return_path, redirect_to)
-  # end
 end
