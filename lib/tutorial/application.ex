@@ -1,6 +1,10 @@
 defmodule Tutorial.Application do
+  @moduledoc """
+
+  """
   use Application
 
+  import TutorialWeb.Endpoint
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   def start(_type, _args) do
@@ -14,7 +18,8 @@ defmodule Tutorial.Application do
       supervisor(TutorialWeb.Endpoint, []),
 
       supervisor(TutorialWeb.Presence, [])
-      # Start your own worker by calling: Tutorial.Worker.start_link(arg1, arg2, arg3)
+      # Start your own worker by calling:
+      # Tutorial.Worker.start_link(arg1, arg2, arg3)
       # worker(Tutorial.Worker, [arg1, arg2, arg3]),
     ]
 
@@ -27,7 +32,7 @@ defmodule Tutorial.Application do
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
   def config_change(changed, _new, removed) do
-    TutorialWeb.Endpoint.config_change(changed, removed)
+    config_change(changed, removed)
     :ok
   end
 end

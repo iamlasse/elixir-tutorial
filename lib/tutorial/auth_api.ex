@@ -1,6 +1,11 @@
 defmodule Tutorial.AuthApi do
+  @moduledoc """
+    Puts current resource in session and assigns for API
+  """
   import Plug.Conn
   import Phoenix.Controller
+  import Guardian.Plug
+  import Phoenix.Token
   alias Tutorial.Accounts
 
   def init(opts) do
@@ -8,7 +13,7 @@ defmodule Tutorial.AuthApi do
   end
 
   def call(conn, _repo) do
-    case Guardian.Plug.current_resource(conn) do
+    case current_resource(conn) do
       nil ->
         conn
         |> assign(:current_user, nil)
@@ -26,7 +31,7 @@ defmodule Tutorial.AuthApi do
   end
 
   defp put_current_user(conn, user) do
-    token = Phoenix.Token.sign(conn, "user salt", user.id)
+    token = sign(conn, "user salt", user.id)
 
     conn
     |> assign(:current_user, user)

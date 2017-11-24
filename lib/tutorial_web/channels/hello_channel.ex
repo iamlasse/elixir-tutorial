@@ -1,10 +1,12 @@
 defmodule TutorialWeb.HelloChannel do
+  @moduledoc """
+    Hello Channel
+  """
   use TutorialWeb, :channel
 
   alias TutorialWeb.Presence
 
   def join("hello:person", payload, socket) do
-    IO.inspect(payload)
 
     if authorized?(payload) do
       send(self(), :after_join)

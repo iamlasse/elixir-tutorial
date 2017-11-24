@@ -1,7 +1,6 @@
 defmodule TutorialWeb.AuthView do
   use TutorialWeb, :view
 
-
   def render("token.json", %{token: token, user: user}) do
     %{
       jwt: token,

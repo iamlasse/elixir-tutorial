@@ -17,7 +17,11 @@ defmodule TutorialWeb.CMS.FlokView do
       title: flok.title,
       description: flok.description,
       creator:
-        render_one(flok.creator, TutorialWeb.CreatorView, "creator.json", creator: flok.creator)
+        render_one(flok.creator,
+          TutorialWeb.CreatorView,
+          "creator.json",
+          creator: flok.creator
+        )
     }
   end
 

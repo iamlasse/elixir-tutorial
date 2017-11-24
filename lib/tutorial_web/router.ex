@@ -1,4 +1,7 @@
 defmodule TutorialWeb.Router do
+  @moduledoc """
+  Router
+  """
   use TutorialWeb, :router
   alias Tutorial.Accounts
 
@@ -65,7 +68,8 @@ defmodule TutorialWeb.Router do
     end
 
     # AUTH
-    resources("/auth", AuthController, only: [:new, :create, :delete], singleton: true)
+    resources("/auth", AuthController,
+      only: [:new, :create, :delete], singleton: true)
   end
 
   scope "/api", TutorialWeb, as: :api do

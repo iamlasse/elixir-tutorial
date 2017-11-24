@@ -1,4 +1,7 @@
 defmodule Tutorial.Guardian do
+  @moduledoc """
+    Module to extend guardian
+  """
   use Guardian, otp_app: :tutorial
   alias Tutorial.Accounts
   def subject_for_token(resource, _claims) do

@@ -1,4 +1,7 @@
 defmodule Tutorial.Accounts.User do
+  @moduledoc """
+    User resource
+  """
   use Ecto.Schema
   import Ecto.Changeset
   alias Tutorial.Accounts.{User, Credential}

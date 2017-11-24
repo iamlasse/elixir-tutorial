@@ -1,8 +1,9 @@
 defmodule TutorialWeb.LayoutView do
   use TutorialWeb, :view
+  import Guardian.Plug
 
   def current_user(conn) do
-    Guardian.Plug.current_resource(conn)
+    current_resource(conn)
   end
 
   def title do

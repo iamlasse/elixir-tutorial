@@ -1,5 +1,9 @@
 defmodule Tutorial.Auth do
+  @moduledoc """
+    Adds current user to conn.asigns
+  """
   import Plug.Conn
+  import Phoenix.Token
   # import Phoenix.Controller
 
   def init(opts) do
@@ -19,7 +23,7 @@ defmodule Tutorial.Auth do
   end
 
   defp put_current_user(conn, user) do
-    token = Phoenix.Token.sign(conn, "user salt", user.id)
+    token = sign(conn, "user salt", user.id)
     conn
     |> assign(:current_user, user)
     |> assign(:user_token, token)

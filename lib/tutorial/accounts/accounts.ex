@@ -4,6 +4,7 @@ defmodule Tutorial.Accounts do
   """
 
   import Ecto.Query, warn: false
+  import Ecto.Changeset
   alias Tutorial.Repo
 
   alias Tutorial.Accounts
@@ -46,9 +47,13 @@ defmodule Tutorial.Accounts do
   end
 
   def find_user(id) do
-    case Repo.get!(User, id) do
-      %User{} = user -> {:ok, user}
-      nil -> {:error, :no_resource}
+    case Repo.get(User, id) do
+      %User{} = user ->
+        user = Repo.preload(user, [:credential, :creator])
+        {:ok, user}
+
+      nil ->
+        {:error, :no_resource}
     end
   end
 
@@ -67,7 +72,7 @@ defmodule Tutorial.Accounts do
   def create_user(attrs \\ %{}) do
     %User{}
     |> User.changeset(attrs)
-    |> Ecto.Changeset.cast_assoc(:credential, with: &Credential.changeset/2)
+    |> cast_assoc(:credential, with: &Credential.changeset/2)
     |> Repo.insert()
   end
 
@@ -86,7 +91,7 @@ defmodule Tutorial.Accounts do
   def update_user(%User{} = user, attrs) do
     user
     |> User.changeset(attrs)
-    |> Ecto.Changeset.cast_assoc(:credential, with: &Credential.changeset/2)
+    |> cast_assoc(:credential, with: &Credential.changeset/2)
     |> Repo.update()
   end
 
@@ -120,7 +125,8 @@ defmodule Tutorial.Accounts do
   end
 
   def verify_credentials(email, password) when is_binary(email) and is_binary(password) do
-    with {:ok, user} <- authenticate_by_email(email), do: verify_password(password, user)
+    with {:ok, user} <- authenticate_by_email(email),
+      do: verify_password(password, user)
   end
 
   # Basic Authentication

@@ -1,4 +1,7 @@
 defmodule Tutorial.Facebook do
+  @moduledoc """
+    Helps verifyng facebook tokens
+  """
   use Tesla, only: [:get]
 
   plug(Tesla.Middleware.BaseUrl, "https://graph.facebook.com/")

@@ -1,4 +1,7 @@
 defmodule TutorialWeb.Presence do
+  @moduledoc """
+    Presence
+  """
   use Phoenix.Presence,
     otp_app: :tutorial,
     pubsub_server: Tutorial.PubSub

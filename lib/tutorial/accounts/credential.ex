@@ -1,8 +1,10 @@
 defmodule Tutorial.Accounts.Credential do
+  @moduledoc """
+    Credential resource
+  """
   use Ecto.Schema
   import Ecto.Changeset
   alias Tutorial.Accounts.{Credential, User}
-
 
   schema "credentials" do
     field :email, :string

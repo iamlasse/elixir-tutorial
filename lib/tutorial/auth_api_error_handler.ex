@@ -1,4 +1,7 @@
 defmodule Tutorial.AuthApiErrorHandler do
+  @moduledoc """
+    Api error handler
+  """
   import Plug.Conn
   import Phoenix.Controller
 

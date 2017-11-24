@@ -51,7 +51,8 @@ defmodule Tutorial.Mixfile do
 
       #
       {:tesla, "~> 0.9.0"},
-      {:httpotion, "~> 3.0.2"}
+      {:httpotion, "~> 3.0.2"},
+      {:credo, "~> 0.8", only: [:dev, :test], runtime: false}
     ]
   end
 

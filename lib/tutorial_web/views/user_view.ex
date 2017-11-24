@@ -2,7 +2,6 @@ defmodule TutorialWeb.UserView do
   use TutorialWeb, :view
 
   def render("user.json", %{user: user}) do
-    IO.inspect user
     %{
       id: user.id,
       username: user.username,

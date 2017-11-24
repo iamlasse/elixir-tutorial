@@ -60,7 +60,6 @@ defmodule TutorialWeb.CMS.FlokController do
     |> redirect(to: cms_flok_path(conn, :index))
   end
 
-
   # Private methods
   defp require_existing_creator(conn, _) do
     creator = CMS.ensure_creator_exists(conn.assigns.current_user)

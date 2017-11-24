@@ -2,6 +2,9 @@ defmodule TutorialWeb.AuthController do
   use TutorialWeb, :controller
 
   alias Tutorial.Accounts
+  import Tutorial.Guardian
+  import Tutorial.Guardian.Plug
+  import Tutorial.Facebook
   # import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
 
   def new(conn, _) do
@@ -12,7 +15,7 @@ defmodule TutorialWeb.AuthController do
     # return_path = Plug.Conn.get_session(conn, :return_path)
     with {:ok, user} <- Accounts.verify_credentials(email, password) do
       conn
-      |> Tutorial.Guardian.Plug.sign_in(user)
+      |> sign_in(user)
       |> put_flash(:info, "Welcome back!")
       |> put_session(:user_id, user.id)
       |> assign(:current_user, user)
@@ -27,7 +30,7 @@ defmodule TutorialWeb.AuthController do
 
   def api_sign_in(conn, %{"email" => email, "password" => password}) do
     with {:ok, user} <- Accounts.verify_credentials(email, password) do
-      {:ok, jwt, claims} = Tutorial.Guardian.encode_and_sign(user, %{})
+      {:ok, jwt, claims} = encode_and_sign(user, %{})
       exp = Map.get(claims, "exp")
 
       # |> put_resp_header("Authorization", "Bearer #{jwt}")
@@ -46,11 +49,12 @@ defmodule TutorialWeb.AuthController do
 
   def authenticate(conn, %{"token" => token}) do
     IO.puts("Login with token from app ------------------->>>>")
-    response = Tutorial.Facebook.verify_user(token)
+    response = verify_user(token)
     # IO.inspect
     if Map.has_key?(response.body, "email") do
-      with {:ok, user} <- Accounts.authenticate_by_email(Map.fetch!(response.body, "email")),
-           {:ok, jwt, claims} <- Tutorial.Guardian.encode_and_sign(user, %{}) do
+      with {:ok, user}
+        <- Accounts.authenticate_by_email(Map.fetch!(response.body, "email")),
+           {:ok, jwt, claims} <- encode_and_sign(user, %{}) do
         exp = Map.get(claims, "exp")
 
         conn
@@ -63,16 +67,18 @@ defmodule TutorialWeb.AuthController do
     end
   end
 
-  def authenticate(conn, _) do
-    conn
-    |> json(%{error: "Token missing"})
-  end
+  def authenticate(conn, _), do: conn |> json(%{error: "Token missing"})
 
   def me(conn, _) do
-    current_user = Tutorial.Guardian.Plug.current_resource(conn)
-    user = Accounts.get_user!(current_user.id)
-    conn
-    |> render(TutorialWeb.UserView, "user.json", user: user)
+    current_user = current_resource(conn)
+    with {:ok, user} <- Accounts.get_user!(current_user.id) do
+      conn
+      |> render(TutorialWeb.UserView, "user.json", user: user)
+    else
+      {:error, :no_resource} ->
+        conn
+        |> json(%{error: "No user logged in"})
+    end
   end
 
   def delete(conn, _) do

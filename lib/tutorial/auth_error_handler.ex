@@ -1,4 +1,7 @@
 defmodule Tutorial.AuthErrorHandler do
+  @moduledoc """
+    Auth error handler
+  """
   import Plug.Conn
   import Phoenix.Controller
 

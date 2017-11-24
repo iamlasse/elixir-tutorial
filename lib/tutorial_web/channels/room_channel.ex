@@ -1,4 +1,7 @@
 defmodule TutorialWeb.RoomChannel do
+  @moduledoc """
+    Room channel
+  """
   use TutorialWeb, :channel
 
   def join("room:lobby", payload, socket) do
