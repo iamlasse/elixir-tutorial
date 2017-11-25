@@ -13,19 +13,13 @@ defmodule Tutorial.AuthApi do
   end
 
   def call(conn, _repo) do
-    case current_resource(conn) do
+    with user <- current_resource(conn),
+         {:ok, user} <- Accounts.find_user(user.id) do
+      put_current_user(conn, user)
+    else
       nil ->
         conn
         |> assign(:current_user, nil)
-
-      user ->
-        with {:ok, user} <- Accounts.find_user(user.id) do
-            put_current_user(conn, user)
-        else
-          nil ->
-            conn
-            |> assign(:current_user, nil)
-        end
     end
   end
 

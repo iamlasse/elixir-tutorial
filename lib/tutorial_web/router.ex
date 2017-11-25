@@ -67,15 +67,14 @@ defmodule TutorialWeb.Router do
     end
 
     # AUTH
-    resources("/auth", AuthController,
-      only: [:new, :create, :delete], singleton: true)
+    resources("/auth", AuthController, only: [:new, :create, :delete], singleton: true)
   end
 
   scope "/api", TutorialWeb, as: :api do
     pipe_through([:api])
 
     scope "/auth" do
-      post "/", AuthController, :api_sign_in
+      post("/", AuthController, :api_sign_in)
     end
 
     scope "/cms", CMS, as: :cms do
@@ -84,9 +83,9 @@ defmodule TutorialWeb.Router do
     end
 
     scope "/v1" do
-      post "/users/auth0", AuthController, :authenticate
+      post("/users/auth0", AuthController, :authenticate)
       pipe_through([:api_pipe, :authorize])
-      get "/users/me", AuthController, :me
+      get("/users/me", AuthController, :me)
     end
   end
 end

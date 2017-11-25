@@ -52,7 +52,8 @@ defmodule TutorialWeb.AuthController do
     response = verify_user(token)
     # IO.inspect
     if Map.has_key?(response.body, "email") do
-      with {:ok, user} <- Accounts.authenticate_by_email(Map.fetch(response.body, "email")),
+      with {:ok, email} <- Map.fetch(response.body, "email"),
+           {:ok, user} <- Accounts.authenticate_by_email(email),
            {:ok, jwt, claims} <- encode_and_sign(user, %{}) do
         exp = Map.get(claims, "exp")
 
