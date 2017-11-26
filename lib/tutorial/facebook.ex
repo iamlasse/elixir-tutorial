@@ -10,8 +10,9 @@ defmodule Tutorial.Facebook do
   # plug Tesla.Middleware.DecodeJson
 
   def verify_user(token) do
-    # get("/user/" <> login <> "/repos")
-    get("me", query: [fields: "email,name,picture", access_token: token])
-    # get("me?fields=name,email,picture&access_token=" <> token)
+    case get("me", query: [fields: "email,name,picture", access_token: token]) do
+      %{body: %{"error"=> error}} -> {:error, error}
+      %{body: body} -> {:ok, body}
+    end
   end
 end

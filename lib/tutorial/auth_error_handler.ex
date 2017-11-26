@@ -7,7 +7,7 @@ defmodule Tutorial.AuthErrorHandler do
 
   def auth_error(conn, {type, reason}, _opts) do
     conn
-    |> put_flash(:error, "You're not logged in")
+    |> put_flash(:error, "You're not logged in #{reason}")
     |> redirect(to: "/auth/new")
   end
 end

@@ -23,7 +23,8 @@ defmodule TutorialWeb.CMS.FlokController do
   end
 
   def create(conn, %{"flok" => flok_params}) do
-    with {:ok, flok} <- CMS.create_flok(conn.assigns.current_creator, flok_params) do
+    with {:ok, flok} <-
+      CMS.create_flok(conn.assigns.current_creator, flok_params) do
         conn
         |> put_flash(:info, "Flok created successfully.")
         |> redirect(to: cms_flok_path(conn, :show, flok))

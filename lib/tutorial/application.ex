@@ -17,10 +17,10 @@ defmodule Tutorial.Application do
       # Start the endpoint when the application starts
       supervisor(TutorialWeb.Endpoint, []),
 
-      supervisor(TutorialWeb.Presence, [])
+      supervisor(TutorialWeb.Presence, []),
       # Start your own worker by calling:
       # Tutorial.Worker.start_link(arg1, arg2, arg3)
-      # worker(Tutorial.Worker, [arg1, arg2, arg3]),
+      # worker(Tutorial.Scheduler, []),
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

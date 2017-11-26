@@ -12,7 +12,6 @@ defmodule TutorialWeb.AuthController do
   end
 
   def create(conn, %{"user" => %{"email" => email, "password" => password}}) do
-    # return_path = Plug.Conn.get_session(conn, :return_path)
     with {:ok, user} <- Accounts.verify_credentials(email, password) do
       conn
       |> sign_in(user)
@@ -33,7 +32,6 @@ defmodule TutorialWeb.AuthController do
       {:ok, jwt, claims} = encode_and_sign(user, %{})
       exp = Map.get(claims, "exp")
 
-      # |> put_resp_header("Authorization", "Bearer #{jwt}")
       conn
       |> put_resp_header("x-expires", "#{exp}")
       |> assign(:current_user, user)
@@ -49,25 +47,26 @@ defmodule TutorialWeb.AuthController do
 
   def authenticate(conn, %{"token" => token}) do
     IO.puts("Login with token from app ------------------->>>>")
-    response = verify_user(token)
-    # IO.inspect
-    if Map.has_key?(response.body, "email") do
-      with {:ok, email} <- Map.fetch(response.body, "email"),
-           {:ok, user} <- Accounts.authenticate_by_email(email),
-           {:ok, jwt, claims} <- encode_and_sign(user, %{}) do
-        exp = Map.get(claims, "exp")
+    with {:ok, response} <- verify_user(token),
+         {:ok, email} <- Map.fetch(response, "email"),
+         {:ok, user} <- Accounts.authenticate_by_email(email),
+         {:ok, jwt, claims} <- encode_and_sign(user, %{}) do
+      exp = Map.get(claims, "exp")
 
-        conn
-        |> put_resp_header("x-expires", "#{exp}")
-        |> render("token.json", token: jwt, user: user)
-      else
-        :error ->
-          conn |> json(%{error: "No user found"})
-      end
-    else
       conn
-      |> json(response.body)
+      |> put_resp_header("x-expires", "#{exp}")
+      |> render("token.json", token: jwt, user: user)
+    else
+      {:error, error} ->
+        conn |> json(%{error: error})
+      :error ->
+        conn |> json(%{error: "No user found"})
     end
+
+    # else
+    #   conn
+    #   |> json(response.body)
+    # end
   end
 
   def authenticate(conn, _), do: conn |> json(%{error: "Token missing"})

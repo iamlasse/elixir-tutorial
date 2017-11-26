@@ -13,8 +13,7 @@ config :tutorial, TutorialWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "nn1T3N4wAXLzZwdKZWSjfAuLPVuarnt6R7TcIPiD765w+vi+zeP1pgBsiHbW+0ni",
   render_errors: [view: TutorialWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: Tutorial.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: Tutorial.PubSub, adapter: Phoenix.PubSub.PG2]
 
 # config :tutorial, TutorialWeb.Endpoint,
 #   url: [host: "localhost"],
@@ -27,6 +26,12 @@ config :tutorial, TutorialWeb.Endpoint,
 #     # port: 32775,
 #     node_name: "hello"
 #   ]
+
+
+config :tutorial, Tutorial.Scheduler,
+  jobs: [
+    {"* * * * *", fn -> Tutorial.Scheduler.schedule_file(Path.join(:code.priv_dir(:tutorial), "tweets.txt")) end }
+  ]
 
 # Configures Elixir's Logger
 config :logger, :console,

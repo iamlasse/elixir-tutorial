@@ -25,18 +25,8 @@ defmodule Tutorial.CMS do
     |> Repo.preload([:players, creator: [:user]])
   end
 
-  def only_creator_floks(user) do
-    query =
-      from(
-        f in Flok,
-        inner_join: c in assoc(f, :creator),
-        where: c.user_id == ^user.id,
-        preload: [:players, :creator]
-      )
-
-    query
-    |> Repo.all
-  end
+  def only_creator_floks(user),
+    do: user |> Ecto.assoc(:floks) |> Repo.all() |> Repo.preload(:creator)
 
   @doc """
   Gets a single flok.

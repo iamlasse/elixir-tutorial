@@ -4,7 +4,6 @@ defmodule TutorialWeb.CMS.WalletController do
   alias Tutorial.Accounts
   alias Tutorial.Accounts.Wallet
 
-
   def index(conn, _params) do
     wallets = Accounts.list_user_wallets(conn.assigns.current_user)
     render(conn, "index.html", wallets: wallets)
